@@ -1347,7 +1347,35 @@ fn detect_target_triplet() -> Result<TargetTriplet, Error> {
     let is_static = env::var("CARGO_CFG_TARGET_FEATURE")
         .unwrap_or(String::new()) // rustc 1.10
         .contains("crt-static");
-    if target == "x86_64-apple-darwin" {
+    if target == "x86_64-linux-android" {
+        Ok(TargetTriplet {
+            triplet: "x64-android".into(),
+            is_static: true,
+            lib_suffix: "a".into(),
+            strip_lib_prefix: true,
+        })
+    } else if target == "aarch64-linux-android" {
+        Ok(TargetTriplet {
+            triplet: "arm64-android".into(),
+            is_static: true,
+            lib_suffix: "a".into(),
+            strip_lib_prefix: true,
+        })
+    } else if target == "armv7-linux-android" {
+        Ok(TargetTriplet {
+            triplet: "arm-android".into(),
+            is_static: true,
+            lib_suffix: "a".into(),
+            strip_lib_prefix: true,
+        })
+    } else if target == "i686-linux-android" {
+        Ok(TargetTriplet {
+            triplet: "x86-android".into(),
+            is_static: true,
+            lib_suffix: "a".into(),
+            strip_lib_prefix: true,
+        })
+    } else if target == "x86_64-apple-darwin" {
         Ok(TargetTriplet {
             triplet: "x64-osx".into(),
             is_static: true,
