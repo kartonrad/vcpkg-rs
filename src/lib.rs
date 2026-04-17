@@ -410,19 +410,27 @@ fn find_vcpkg_target(cfg: &Config, target_triplet: &TargetTriplet) -> Result<Vcp
     let vcpkg_root = try!(find_vcpkg_root(&cfg));
     try!(validate_vcpkg_root(&vcpkg_root));
 
-    let mut base = cfg
+    let installed_root = cfg
         .vcpkg_installed_root
         .clone()
-        .or(env::var_os("VCPKG_INSTALLED_ROOT").map(PathBuf::from))
-        .unwrap_or(vcpkg_root.join("installed"));
+        .or(env::var_os("VCPKG_INSTALLED_ROOT").map(PathBuf::from));
 
-    let status_path = base.join("vcpkg");
+    let mut root = match installed_root { 
+        Some(path) => path,
+        None => {
+            let vcpkg_root = try!(find_vcpkg_root(&cfg));
+            try!(validate_vcpkg_root(&vcpkg_root));
+            vcpkg_root
+        }
+    };
 
-    base.push(&target_triplet.triplet);
+    let status_path = root.join("vcpkg");
 
-    let lib_path = base.join("lib");
-    let bin_path = base.join("bin");
-    let include_path = base.join("include");
+    root.push(&target_triplet.triplet);
+
+    let lib_path = root.join("lib");
+    let bin_path = root.join("bin");
+    let include_path = root.join("include");
     let packages_path = vcpkg_root.join("packages");
 
     Ok(VcpkgTarget {
